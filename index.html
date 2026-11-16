@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Matemático 2027 — EE Felisberto Alves Carrejo</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fontes Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #020617;
+      color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nexus-grid-bg {
+      background-image:
+        radial-gradient(circle at 12% 8%, rgba(34, 211, 238, 0.12), transparent 36%),
+        radial-gradient(circle at 88% 12%, rgba(52, 211, 153, 0.10), transparent 36%),
+        radial-gradient(circle at 50% 92%, rgba(251, 191, 36, 0.08), transparent 42%);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-panel {
+      animation: panelFadeIn 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 nexus-grid-bg antialiased">
+
+  <!-- ==================== CABEÇALHO FIXO ==================== -->
+  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/90 shadow-xl shadow-black/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+      
+      <!-- Linha 1: Marca + Status da Nuvem + Modo Professor -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-emerald-500/15 to-amber-500/20 border border-cyan-400/35 flex items-center justify-center shrink-0 shadow-inner">
+            <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 21.5 7.5 21.5 16.5 12 22 2.5 16.5 2.5 7.5 12 2"></polygon>
+              <line x1="12" y1="22" x2="12" y2="12"></line>
+              <polyline points="21.5 7.5 12 12 2.5 7.5"></polyline>
+              <circle cx="12" cy="12" r="2.2" fill="currentColor"></circle>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white">
+                Nexus Matemático <span class="text-cyan-400">2027</span>
+              </h1>
+              <!-- Badge Dinâmico de Sincronização em Nuvem -->
+              <span id="cloudStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                📱 Modo Local
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 font-medium truncate">
+              EE Felisberto Alves Carrejo • 2º Ano EM (Turmas 201, 202, 203 e 204)
+            </p>
+          </div>
+        </div>
+
+        <!-- Botões de Ação do Cabeçalho -->
+        <div class="flex items-center gap-2 ml-auto sm:ml-0">
+          <button
+            type="button"
+            id="btnManualSync"
+            onclick="manualCloudRefresh()"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 hover:border-cyan-500/40 transition active:scale-95"
+            title="Atualizar dados da nuvem"
+          >
+            <span id="manualSyncIcon">🔄</span>
+            <span>Atualizar</span>
+          </button>
+
+          <button
+            type="button"
+            id="btnTeacherMode"
+            onclick="handleTeacherButton()"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md shadow-amber-500/15 transition active:scale-95"
+          >
+            <span id="teacherBtnIcon">🔐</span>
+            <span id="teacherBtnText">Modo Professor</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Linha 2: Seletor de Temporada (Trimestres) + Filtro de Turmas -->
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5 pt-2.5 border-t border-slate-800/80">
+        <!-- Seletor de Temporada -->
+        <div class="grid grid-cols-3 sm:inline-flex p-1 rounded-xl bg-slate-950/90 border border-slate-800 gap-1" role="group" aria-label="Temporada">
+          <button type="button" data-season="T1" onclick="setSeason('T1')" class="season-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-center">
+            1º Trimestre • 30 pts
+          </button>
+          <button type="button" data-season="T2" onclick="setSeason('T2')" class="season-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-center">
+            2º Trimestre • 30 pts
+          </button>
+          <button type="button" data-season="T3" onclick="setSeason('T3')" class="season-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-center">
+            3º Trimestre • 40 pts
+          </button>
+        </div>
+
+        <!-- Filtro de Turmas -->
+        <div class="flex items-center justify-between sm:justify-end gap-1.5 flex-wrap">
+          <span class="text-xs font-semibold text-slate-400 mr-1">Turma:</span>
+          <div class="inline-flex p-1 rounded-xl bg-slate-950/90 border border-slate-800 gap-1">
+            <button type="button" data-turma="ALL" onclick="setClassFilter('ALL')" class="turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition">Todas</button>
+            <button type="button" data-turma="201" onclick="setClassFilter('201')" class="turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition">201</button>
+            <button type="button" data-turma="202" onclick="setClassFilter('202')" class="turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition">202</button>
+            <button type="button" data-turma="203" onclick="setClassFilter('203')" class="turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition">203</button>
+            <button type="button" data-turma="204" onclick="setClassFilter('204')" class="turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition">204</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ============================================================ -->
+    <!-- VISÃO PÚBLICA DO ESTUDANTE (100% LGPD — ZERO NOMES REAIS)    -->
+    <!-- ============================================================ -->
+    <section id="publicView" class="space-y-6">
+
+      <!-- Navegação das 3 Abas Principais -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <nav class="grid grid-cols-1 sm:inline-flex p-1 rounded-2xl bg-slate-900 border border-slate-800 gap-1" aria-label="Abas Principais">
+          <button
+            type="button"
+            data-pubtab="ranking"
+            onclick="setPublicTab('ranking')"
+            class="pub-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-left sm:text-center"
+          >
+            🏆 Ranking &amp; Meta Coletiva
+          </button>
+          <button
+            type="button"
+            data-pubtab="profile"
+            onclick="setPublicTab('profile')"
+            class="pub-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left sm:text-center"
+          >
+            🔍 Meu Perfil &amp; Cards
+          </button>
+          <button
+            type="button"
+            data-pubtab="rules"
+            onclick="setPublicTab('rules')"
+            class="pub-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left sm:text-center"
+          >
+            📜 Regras &amp; Missões
+          </button>
+        </nav>
+
+        <div class="inline-flex items-center gap-2 text-xs text-slate-400 px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 self-start sm:self-center">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>LGPD: Somente codinomes públicos exibidos</span>
+        </div>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- ABA 1: 🏆 RANKING & META COLETIVA                          -->
+      <!-- ========================================================== -->
+      <div id="tabRankingPanel" class="space-y-6 animate-panel">
+
+        <!-- Termômetro da Meta Coletiva da Turma -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3.5">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  Meta Coletiva da Turma
+                </span>
+                <h2 id="goalScopeTitle" class="text-base sm:text-lg font-extrabold text-cyan-400">
+                  Todas as Turmas • 1º Trimestre
+                </h2>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                Alvo: <strong class="text-slate-200">80% com 90+ XP (⚡ Estrategista ou superior)</strong> = <span class="text-amber-400 font-semibold">Desbloqueia 10 min de música ambiente na aula de revisão!</span>
+              </p>
+            </div>
+
+            <div class="flex items-baseline gap-2 md:text-right shrink-0">
+              <span id="goalPctDisplay" class="font-mono text-3xl font-extrabold text-emerald-400">0%</span>
+              <span id="goalRatioDisplay" class="text-xs font-semibold text-slate-400">(0/20 jogadores)</span>
+            </div>
+          </div>
+
+          <div class="relative w-full h-5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+            <div
+              id="goalProgressBar"
+              class="h-full bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 rounded-full transition-all duration-500"
+              style="width: 0%"
+            ></div>
+            <!-- Marcador visual de 80% -->
+            <div class="absolute top-0 bottom-0 left-[80%] w-0.5 bg-white shadow-[0_0_8px_#fff]" title="Meta de 80%"></div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs mt-2.5">
+            <span id="goalStatusText" class="text-slate-300 font-medium">Calculando progresso...</span>
+            <span class="text-amber-400 font-extrabold">🎯 Meta: 80%</span>
+          </div>
+        </div>
+
+        <!-- Pódio Top 3 (Ouro, Prata, Bronze) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+              <span>👑</span> Pódio da Temporada — <span id="podiumSeasonLabel" class="text-cyan-400">1º Trimestre</span>
+            </h2>
+            <span class="text-xs text-slate-400 hidden sm:inline">Toque em um card para abrir o perfil</span>
+          </div>
+
+          <div id="podiumContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Gerado via JS -->
+          </div>
+        </div>
+
+        <!-- Grid Inferior: Ranking Completo (8 cols) + Últimas Missões Validadas (4 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Ranking Completo -->
+          <div class="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h3 class="text-base font-extrabold text-white">📊 Classificação Completa</h3>
+                <p class="text-xs text-slate-400">Progresso até a próxima patente e cards desbloqueados.</p>
+              </div>
+              <div class="relative w-full sm:w-60">
+                <input
+                  type="text"
+                  id="rankingSearchInput"
+                  oninput="renderRankingTab()"
+                  placeholder="Filtrar codinome..."
+                  class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition"
+                />
+                <svg class="w-4 h-4 text-slate-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-950/80 border-b border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <th class="py-3 pl-4 pr-2 text-center w-14">Pos.</th>
+                    <th class="py-3 px-3">Codinome</th>
+                    <th class="py-3 px-2 text-center">Turma</th>
+                    <th class="py-3 px-3">Patente &amp; Evolução</th>
+                    <th class="py-3 px-2 text-center">Cards</th>
+                    <th class="py-3 pl-2 pr-4 text-right">XP</th>
+                  </tr>
+                </thead>
+                <tbody id="rankingTableBody" class="divide-y divide-slate-800/70 text-sm">
+                  <!-- Gerado via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Feed Últimas Missões Validadas -->
+          <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 class="text-base font-extrabold text-white">⚡ Últimas Missões Validadas</h3>
+                <p class="text-xs text-slate-400">Registros recentes da temporada</p>
+              </div>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+
+            <div id="recentLogsFeed" class="divide-y divide-slate-800/70 max-h-[540px] overflow-y-auto">
+              <!-- Gerado via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- ABA 2: 🔍 MEU PERFIL & CARDS                               -->
+      <!-- ========================================================== -->
+      <div id="tabProfilePanel" class="hidden space-y-6 animate-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Seletor de Codinome + Cartão do Jogador (7 cols) -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+              <div class="flex items-center justify-between">
+                <h2 class="text-base sm:text-lg font-extrabold text-white">🔍 Consultar Meu Perfil no Nexus</h2>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                  100% Privado
+                </span>
+              </div>
+              <p class="text-xs text-slate-400">
+                Digite ou escolha seu <strong class="text-slate-200">Codinome Secreto</strong> anotado no caderno para conferir seus cards desbloqueados e seu histórico:
+              </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div class="relative">
+                  <input
+                    type="text"
+                    id="profileSearchInput"
+                    oninput="onProfileSearch(this.value)"
+                    placeholder="Buscar seu codinome..."
+                    class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm text-white placeholder-slate-500 outline-none transition"
+                  />
+                  <svg class="w-4 h-4 text-slate-500 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                  </svg>
+                </div>
+
+                <select
+                  id="profileSelectDropdown"
+                  onchange="selectProfileCodename(this.value)"
+                  aria-label="Selecionar Codinome"
+                  class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-sm font-semibold text-slate-200 outline-none transition"
+                >
+                  <!-- Gerado via JS -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Cartão Completo do Estudante -->
+            <div id="studentProfileCard" class="bg-slate-900/95 border border-cyan-500/30 rounded-2xl shadow-2xl overflow-hidden">
+              <!-- Gerado via JS -->
+            </div>
+          </div>
+
+          <!-- Histórico Individual de Missões (5 cols) -->
+          <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-5 border-b border-slate-800">
+              <h3 class="text-base font-extrabold text-white">📜 Histórico de Missões do Codinome</h3>
+              <p class="text-xs text-slate-400">Registros validados neste trimestre</p>
+            </div>
+            <div id="studentPersonalHistory" class="divide-y divide-slate-800/70 max-h-[520px] overflow-y-auto">
+              <!-- Gerado via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- ABA 3: 📜 REGRAS & MISSÕES                                 -->
+      <!-- ========================================================== -->
+      <div id="tabRulesPanel" class="hidden space-y-6 animate-panel">
+
+        <!-- As 4 Leis do Nexus -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+          <div class="mb-5">
+            <h2 class="text-lg sm:text-xl font-extrabold text-white">
+              ⚖️ As 4 Leis Fundamentais do <span class="text-cyan-400">Nexus Matemático</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+              Combinados oficiais de engajamento, proteção de dados e validação de aprendizagem na EE Felisberto Alves Carrejo.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-950/85 border border-slate-800">
+              <div class="flex items-center gap-2.5 mb-2">
+                <span class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-mono font-extrabold flex items-center justify-center text-sm">01</span>
+                <h3 class="font-bold text-white">Lei 1: Identidade Secreta (LGPD)</h3>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Cada estudante joga sob um <strong class="text-slate-200">Codinome Secreto</strong> e Avatar. No painel público jamais aparecem nomes reais ou notas vermelhas, e o XP reinicia a cada trimestre.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-400/5 border border-amber-400/30">
+              <div class="flex items-center gap-2.5 mb-2">
+                <span class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-400 border border-amber-400/35 font-mono font-extrabold flex items-center justify-center text-sm">02</span>
+                <h3 class="font-bold text-amber-400">Lei 2: “Sem Defesa, Sem XP” (Questão Gêmea)</h3>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Listas feitas em casa servem como treino. Folhas copiadas de colegas ou geradas por I.A. <strong class="text-amber-400">valem 0 XP</strong>. Os pontos só são validados após resolver em sala (sem celular) a <strong class="text-white">Questão Gêmea</strong>.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-400/5 border border-emerald-400/30">
+              <div class="flex items-center gap-2.5 mb-2">
+                <span class="w-8 h-8 rounded-xl bg-emerald-400/20 text-emerald-400 border border-emerald-400/35 font-mono font-extrabold flex items-center justify-center text-sm">03</span>
+                <h3 class="font-bold text-emerald-400">Lei 3: Missão Tutor Socrático</h3>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Ao usar Inteligência Artificial em casa para estudar, peça apenas <strong class="text-white">dicas conceituais sem pedir a resposta pronta</strong> e registre todo o cálculo no caderno para ganhar XP de autonomia.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-950/85 border border-slate-800">
+              <div class="flex items-center gap-2.5 mb-2">
+                <span class="w-8 h-8 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 font-mono font-extrabold flex items-center justify-center text-sm">04</span>
+                <h3 class="font-bold text-white">Lei 4: Foco Coletivo</h3>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Celular guardado na mochila durante as explicações e atividades, sendo liberado apenas quando autorizado pela professora para consulta ao ranking ou missões.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela Oficial de Pontuação + Patentes -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-5 border-b border-slate-800">
+              <h3 class="text-base sm:text-lg font-extrabold text-white">🎯 Tabela Oficial de Pontuação (XP)</h3>
+              <p class="text-xs text-slate-400">Integra a nota de Atividades Contínuas (5,0 pts no 1º e 2º Trim.; 7,0 pts no 3º Trim.).</p>
+            </div>
+            <div class="divide-y divide-slate-800/80 text-sm">
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="font-bold text-white">📘 Visto de Caderno / Questão Gêmea</p>
+                  <p class="text-xs text-slate-400">Caderno completo + validação sem celular em sala.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-400/15 text-emerald-400 border border-emerald-400/30 shrink-0">+30 XP</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="font-bold text-white">⚡ Desafio Relâmpago</p>
+                  <p class="text-xs text-slate-400">Resolução individual nos 10 minutos finais da aula.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-400/15 text-emerald-400 border border-emerald-400/30 shrink-0">+30 XP</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="font-bold text-white">📊 Missão SIMAVE</p>
+                  <p class="text-xs text-slate-400">Mini-simulado PROEB/ENEM com cálculos registrados.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-400/15 text-emerald-400 border border-emerald-400/30 shrink-0">+30 XP</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="font-bold text-white">🤝 Tutoria Nexus</p>
+                  <p class="text-xs text-slate-400">Apoiar colegas na monitoria explicando o passo a passo.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-400/15 text-emerald-400 border border-emerald-400/30 shrink-0">+30 XP</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3 bg-amber-400/5">
+                <div>
+                  <p class="font-bold text-amber-400">🧩 Lista Dirigida de Recomposição</p>
+                  <p class="text-xs text-slate-400">Roteiro em 3 blocos entregue + aprovação no Bilhete Gêmeo.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-amber-400/20 text-amber-400 border border-amber-400/40 shrink-0">+50 XP</span>
+              </div>
+              <div class="p-4 flex items-center justify-between gap-3 bg-rose-500/5">
+                <div>
+                  <p class="font-bold text-rose-400">⚠️ Pendência de Combinado</p>
+                  <p class="text-xs text-slate-400">Uso não autorizado de celular, cópia ou descumprimento de regra.</p>
+                </div>
+                <span class="font-mono px-3 py-1 rounded-xl text-xs font-extrabold bg-rose-500/15 text-rose-400 border border-rose-500/30 shrink-0">-30 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+            <h3 class="text-base sm:text-lg font-extrabold text-white">🏅 Patentes &amp; Cards Desbloqueáveis</h3>
+            <p class="text-xs text-slate-400">Evolua sua patente dentro de cada trimestre:</p>
+
+            <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800">
+              <div class="flex items-center justify-between font-bold text-sm text-slate-200">
+                <span>🌱 Aprendiz</span>
+                <span class="font-mono text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300">0–89 XP</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Patente inicial no começo de cada temporada trimestral.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-cyan-400/10 border border-cyan-400/30">
+              <div class="flex items-center justify-between font-bold text-sm text-cyan-400">
+                <span>⚡ Estrategista</span>
+                <span class="font-mono text-xs px-2 py-0.5 rounded-lg bg-cyan-400/20 text-cyan-300">90–149 XP</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1">
+                Desbloqueia o <strong class="text-white">🎟️ Card "Vida Extra"</strong>: +1 dia de prazo em tarefa sem desconto de XP.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-amber-400/10 border border-amber-400/30">
+              <div class="flex items-center justify-between font-bold text-sm text-amber-400">
+                <span>👑 Mestre</span>
+                <span class="font-mono text-xs px-2 py-0.5 rounded-lg bg-amber-400/20 text-amber-300">150–209 XP</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1">
+                Desbloqueia o <strong class="text-white">💡 Card "Consulta Express"</strong>: 1 dica conceitual direta da professora durante a prova.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-emerald-400/10 border border-emerald-400/35">
+              <div class="flex items-center justify-between font-bold text-sm text-emerald-400">
+                <span>🔥 Lenda</span>
+                <span class="font-mono text-xs px-2 py-0.5 rounded-lg bg-emerald-400/20 text-emerald-300">210+ XP</span>
+              </div>
+              <p class="text-xs text-slate-200 mt-1">
+                Desbloqueia o <strong class="text-amber-400">🛡️ Selo "Tutor Nexus"</strong>: lugar preferencial nas aulas de exercícios e destaque oficial.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- VISÃO DO MODO PROFESSOR (PROTEGIDO POR PIN: 2027)            -->
+    <!-- ============================================================ -->
+    <section id="teacherView" class="hidden space-y-6 animate-panel">
+
+      <!-- Barra Superior Docente com Status de Envio para Nuvem -->
+      <div class="bg-slate-900 border border-amber-400/35 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-xl">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shrink-0">
+            👩‍🏫
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Painel da Professora</h2>
+              <span id="teacherPushStatus" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                📱 Pronto para lançar
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Cada lançamento atualiza o aparelho e envia automaticamente para a nuvem se configurada.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            id="btnUndoAction"
+            onclick="undoLastTeacherAction()"
+            class="hidden px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-400/30 transition"
+          >
+            ↩️ Desfazer Último Lançamento
+          </button>
+          <button
+            type="button"
+            onclick="exitTeacherMode()"
+            class="px-4 py-2 rounded-xl text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition"
+          >
+            👁️ Sair do Modo Professor
+          </button>
+        </div>
+      </div>
+
+      <!-- Abas Internas do Modo Professor -->
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          data-ttab="batch"
+          onclick="setTeacherTab('batch')"
+          class="teacher-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition"
+        >
+          🚀 Lançamento Rápido em Lote
+        </button>
+        <button
+          type="button"
+          data-ttab="roster"
+          onclick="setTeacherTab('roster')"
+          class="teacher-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition"
+        >
+          👥 Gestão de Turmas &amp; Cadastro (<span id="totalStudentsCount">20</span>)
+        </button>
+        <button
+          type="button"
+          data-ttab="cloud"
+          onclick="setTeacherTab('cloud')"
+          class="teacher-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition"
+        >
+          ☁️ Sincronização Automática em Nuvem (GitHub + Google)
+        </button>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- SUB-ABA DOCENTE 1: LANÇAMENTO RÁPIDO EM LOTE               -->
+      <!-- ========================================================== -->
+      <div id="teacherBatchTab" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Configuração da Chamada Gamificada (5 cols) -->
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-xl">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400">1. Turma &amp; Trimestre</span>
+            <div class="grid grid-cols-4 gap-2 mt-2">
+              <button type="button" data-bclass="201" onclick="setBatchClass('201')" class="batch-class-btn py-2.5 rounded-xl text-sm font-extrabold border transition">201</button>
+              <button type="button" data-bclass="202" onclick="setBatchClass('202')" class="batch-class-btn py-2.5 rounded-xl text-sm font-extrabold border transition">202</button>
+              <button type="button" data-bclass="203" onclick="setBatchClass('203')" class="batch-class-btn py-2.5 rounded-xl text-sm font-extrabold border transition">203</button>
+              <button type="button" data-bclass="204" onclick="setBatchClass('204')" class="batch-class-btn py-2.5 rounded-xl text-sm font-extrabold border transition">204</button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-2.5">
+              <button type="button" data-bseason="T1" onclick="setBatchSeason('T1')" class="batch-season-btn py-2 rounded-xl text-xs font-extrabold border transition">1º Trim.</button>
+              <button type="button" data-bseason="T2" onclick="setBatchSeason('T2')" class="batch-season-btn py-2 rounded-xl text-xs font-extrabold border transition">2º Trim.</button>
+              <button type="button" data-bseason="T3" onclick="setBatchSeason('T3')" class="batch-season-btn py-2 rounded-xl text-xs font-extrabold border transition">3º Trim.</button>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400">2. Escolha a Missão</span>
+            <div id="batchMissionButtons" class="space-y-2 mt-2">
+              <!-- Gerado via JS -->
+            </div>
+          </div>
+
+          <!-- Missão Personalizada Opcional -->
+          <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2.5">
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-200">
+              <input type="checkbox" id="useCustomMissionCheck" onchange="toggleCustomMissionInputs()" class="w-4 h-4 rounded accent-cyan-400" />
+              <span>Usar missão ou valor de XP personalizado</span>
+            </label>
+            <div id="customMissionFields" class="hidden grid grid-cols-3 gap-2 pt-1">
+              <input
+                type="text"
+                id="customMissionTitle"
+                placeholder="Ex: Bônus Tutor Socrático"
+                class="col-span-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white outline-none focus:border-cyan-400"
+              />
+              <input
+                type="number"
+                id="customMissionXP"
+                value="20"
+                step="5"
+                class="col-span-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 font-mono text-xs text-cyan-400 font-bold outline-none focus:border-cyan-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Estudantes para Toque Rápido (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div class="p-4 sm:p-5 border-b border-slate-800 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400">3. Selecione os Estudantes</span>
+                <h3 class="text-base font-extrabold text-white">
+                  Turma <span id="batchTurmaLabel" class="text-cyan-400">201</span> • <span id="batchTrimLabel" class="text-amber-400">1º Trimestre</span>
+                </h3>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  onclick="selectAllBatchStudents(true)"
+                  class="px-3 py-2 rounded-xl text-xs font-extrabold bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-400 border border-cyan-400/30 transition"
+                >
+                  ☑️ Selecionar Todos
+                </button>
+                <button
+                  type="button"
+                  onclick="selectAllBatchStudents(false)"
+                  class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+                >
+                  Limpar
+                </button>
+              </div>
+            </div>
+
+            <input
+              type="text"
+              id="batchFilterInput"
+              oninput="renderBatchStudentList()"
+              placeholder="Buscar por nome real ou codinome..."
+              class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 text-xs sm:text-sm text-white placeholder-slate-500 outline-none"
+            />
+          </div>
+
+          <div id="batchStudentChecklist" class="divide-y divide-slate-800/80 max-h-[430px] overflow-y-auto">
+            <!-- Gerado via JS -->
+          </div>
+
+          <div class="p-4 bg-slate-950/90 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">
+              <strong id="batchSelectedCounter" class="font-mono text-white text-sm">0</strong> estudante(s) marcado(s)
+            </span>
+            <button
+              type="button"
+              onclick="submitBatchXP()"
+              class="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-extrabold bg-emerald-400 hover:bg-emerald-300 text-slate-950 shadow-lg shadow-emerald-500/20 transition active:scale-95"
+            >
+              🚀 Registrar XP &amp; Enviar para Nuvem
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- SUB-ABA DOCENTE 2: GESTÃO DE TURMAS & CADASTRO             -->
+      <!-- ========================================================== -->
+      <div id="teacherRosterTab" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Coluna Esquerda: Cadastro Individual + Importação em Lote (5 cols) -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Cadastro Individual -->
+            <form onsubmit="handleAddStudent(event)" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3.5 shadow-xl">
+              <h3 class="text-base font-extrabold text-white">➕ Adicionar Estudante</h3>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Nome Real (Privado — só Professora)</label>
+                <input type="text" id="newStudentRealName" required placeholder="Ex: Ana Clara Souza" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">Turma</label>
+                  <select id="newStudentTurma" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400">
+                    <option value="201">201</option>
+                    <option value="202">202</option>
+                    <option value="203">203</option>
+                    <option value="204">204</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1">Avatar</label>
+                  <select id="newStudentAvatar" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400">
+                    <option value="🧙‍♂️">🧙‍♂️ Mago</option>
+                    <option value="🚀">🚀 Foguete</option>
+                    <option value="📐">📐 Esquadro</option>
+                    <option value="🎲">🎲 Dado</option>
+                    <option value="🌟">🌟 Estrela</option>
+                    <option value="⚡">⚡ Raio</option>
+                    <option value="🧠">🧠 Cérebro</option>
+                    <option value="🦊">🦊 Raposa</option>
+                    <option value="🛡️">🛡️ Escudo</option>
+                    <option value="🎯">🎯 Alvo</option>
+                    <option value="🔥">🔥 Fogo</option>
+                    <option value="👾">👾 Pixel</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Codinome Público (Único)</label>
+                <input type="text" id="newStudentCodinome" required placeholder="Ex: Pitagoras_201" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400" />
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition">
+                Cadastrar &amp; Sincronizar
+              </button>
+            </form>
+
+            <!-- Importação em Lote via Texto -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-xl">
+              <h3 class="text-base font-extrabold text-white">📋 Importar Lista em Lote</h3>
+              <p class="text-xs text-slate-400">
+                Cole uma linha por estudante no formato: <code class="font-mono text-cyan-400">Nome Real; Turma; Codinome; Avatar</code>
+              </p>
+              <textarea
+                id="bulkImportTextarea"
+                rows="4"
+                placeholder="Lucas Silva; 201; Euler_MG; 🚀&#10;Maria Santos; 202; Hypatia_02; 🌟"
+                class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-cyan-400"
+              ></textarea>
+              <button
+                type="button"
+                onclick="handleBulkImport()"
+                class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-400 hover:bg-emerald-300 text-slate-950 transition"
+              >
+                Importar &amp; Enviar para Nuvem
+              </button>
+            </div>
+          </div>
+
+          <!-- Coluna Direita: Tabela Completa com Edição, Exclusão e Reset (7 cols) -->
+          <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-extrabold text-white">🗂️ Cadastro Privado das Turmas</h3>
+                <p class="text-xs text-slate-400">Edite dados, ajuste XP ou reinicie o trimestre.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  id="rosterSearchInput"
+                  oninput="renderRosterManagementTable()"
+                  placeholder="Filtrar..."
+                  class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white outline-none focus:border-cyan-400 w-36 sm:w-44"
+                />
+                <button
+                  type="button"
+                  onclick="openConfirmDialog('resetTrimester')"
+                  class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition"
+                >
+                  🔄 Resetar Trimestre
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[560px] overflow-y-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead class="bg-slate-950 border-b border-slate-800 text-[11px] uppercase text-slate-400 sticky top-0">
+                  <tr>
+                    <th class="py-3 px-3">Turma</th>
+                    <th class="py-3 px-3">Nome Real (Privado)</th>
+                    <th class="py-3 px-3">Codinome</th>
+                    <th class="py-3 px-3 text-right font-mono">T1 / T2 / T3</th>
+                    <th class="py-3 px-3 text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="rosterManagementBody" class="divide-y divide-slate-800/70">
+                  <!-- Gerado via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- SUB-ABA DOCENTE 3: SINCRONIZAÇÃO AUTOMÁTICA EM NUVEM       -->
+      <!-- ========================================================== -->
+      <div id="teacherCloudTab" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Configuração da URL & Download do index.html (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xl">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-400/15 text-emerald-400 border border-emerald-400/30">
+              Zero Planilha Aberta • Sincronização Automática
+            </span>
+            <h3 class="text-lg font-extrabold text-white mt-2">
+              ☁️ Sincronização Automática em Nuvem (GitHub + Google)
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+              Conecte uma URL do <strong class="text-slate-200">Google Apps Script</strong> uma única vez. Depois disso, todo XP que você lançar no celular ou computador aparece automaticamente no link do GitHub para os alunos!
+            </p>
+          </div>
+
+          <div class="space-y-2.5">
+            <label for="cloudUrlInput" class="block text-xs font-bold text-slate-200">
+              URL do Aplicativo Web (Google Apps Script):
+            </label>
+            <input
+              type="url"
+              id="cloudUrlInput"
+              placeholder="https://script.google.com/macros/s/.../exec"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 font-mono text-xs text-white placeholder-slate-500 outline-none"
+            />
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button
+                type="button"
+                onclick="saveAndTestCloudUrl()"
+                class="px-4 py-2.5 rounded-xl text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition active:scale-95"
+              >
+                ✅ Salvar &amp; Testar Conexão
+              </button>
+              <button
+                type="button"
+                onclick="forcePushToCloud()"
+                class="px-4 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-400 hover:bg-emerald-300 text-slate-950 transition active:scale-95"
+              >
+                ⬆️ Forçar Envio para Nuvem
+              </button>
+              <button
+                type="button"
+                onclick="disconnectCloudUrl()"
+                class="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              >
+                Desconectar
+              </button>
+            </div>
+          </div>
+
+          <!-- Botão Principal: Baixar index.html Pronto para GitHub -->
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-400/10 via-cyan-400/10 to-emerald-400/10 border border-amber-400/35 space-y-2.5">
+            <h4 class="text-sm font-extrabold text-amber-400">
+              📦 Publicação Instantânea no GitHub Pages
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Depois de salvar a URL acima, clique no botão abaixo para baixar o arquivo <code class="font-mono text-white">index.html</code> já configurado com o endereço da sua nuvem embutido. Basta enviá-lo para o seu repositório no GitHub!
+            </p>
+            <button
+              type="button"
+              onclick="downloadConfiguredIndexHtml()"
+              class="w-full sm:w-auto px-5 py-3 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-lg shadow-amber-500/15 transition active:scale-95"
+            >
+              ⬇️ Baixar index.html Já Configurado para o GitHub
+            </button>
+          </div>
+        </div>
+
+        <!-- Código do Google Apps Script Pronto para Copiar (5 cols) -->
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-base font-extrabold text-white">⚙️ Script do Google (2 Minutos)</h3>
+            <button
+              type="button"
+              onclick="copyGoogleAppsScript()"
+              class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition active:scale-95 shrink-0"
+            >
+              📋 Copiar Script do Google
+            </button>
+          </div>
+
+          <ol class="text-xs text-slate-300 space-y-1.5 list-decimal list-inside">
+            <li>Abra qualquer Planilha Google nova em <strong>sheets.new</strong>.</li>
+            <li>Vá em <strong>Extensões ➔ Apps Script</strong>, apague tudo e cole o código abaixo.</li>
+            <li>Clique em <strong>Implantar ➔ Nova implantação ➔ App da Web</strong>.</li>
+            <li>Em <em>Quem pode acessar</em>, selecione <strong>Qualquer pessoa</strong> e copie a URL gerada.</li>
+          </ol>
+
+          <pre id="appsScriptCodeBlock" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-72 leading-relaxed select-all"></pre>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== RODAPÉ ==================== -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/90 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <p>
+        <strong class="text-slate-300">Nexus Matemático 2027</strong> • EE Felisberto Alves Carrejo (MG) • Calendário SEE-MG &amp; CRMG
+      </p>
+      <p>
+        100% LGPD: Apenas codinomes públicos exibidos aos estudantes.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL DE PIN DO PROFESSOR ==================== -->
+  <div id="pinModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-panel space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-400 border border-amber-400/35 flex items-center justify-center">🔐</span>
+          <div>
+            <h3 class="text-base font-extrabold text-white">Acesso Docente</h3>
+            <p class="text-xs text-slate-400">EE Felisberto Alves Carrejo</p>
+          </div>
+        </div>
+        <button type="button" onclick="closePinModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300">
+        Digite o PIN da professora para gerenciar turmas, lançar XP e sincronizar com a nuvem:
+      </p>
+
+      <form onsubmit="verifyTeacherPin(event)" class="space-y-3">
+        <input
+          type="password"
+          inputmode="numeric"
+          maxlength="8"
+          id="pinInputField"
+          placeholder="••••"
+          class="w-full text-center font-mono tracking-[0.45em] text-xl font-extrabold py-3 rounded-xl bg-slate-950 border border-slate-700 focus:border-amber-400 text-white outline-none"
+        />
+        <p id="pinErrorMsg" class="hidden text-xs font-bold text-rose-400 text-center">
+          PIN incorreto. Tente novamente.
+        </p>
+        <p class="text-[11px] text-center text-slate-500">
+          PIN padrão: <strong class="font-mono text-slate-300">2027</strong>
+        </p>
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closePinModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 transition">
+            Entrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE EDIÇÃO DE ESTUDANTE ==================== -->
+  <div id="editStudentModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-panel space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">✏️ Editar Estudante</h3>
+        <button type="button" onclick="closeEditStudentModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <form onsubmit="saveEditedStudent(event)" class="space-y-3">
+        <input type="hidden" id="editStudentId" />
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Nome Real (Privado)</label>
+          <input type="text" id="editStudentRealName" required class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400" />
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Turma</label>
+            <select id="editStudentTurma" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400">
+              <option value="201">201</option>
+              <option value="202">202</option>
+              <option value="203">203</option>
+              <option value="204">204</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Avatar</label>
+            <input type="text" id="editStudentAvatar" required maxlength="4" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Codinome Público</label>
+          <input type="text" id="editStudentCodinome" required class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white outline-none focus:border-cyan-400" />
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 mb-1">XP 1º Trim.</label>
+            <input type="number" id="editStudentXpT1" min="0" class="w-full px-2.5 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-cyan-400 font-bold outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 mb-1">XP 2º Trim.</label>
+            <input type="number" id="editStudentXpT2" min="0" class="w-full px-2.5 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-cyan-400 font-bold outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 mb-1">XP 3º Trim.</label>
+            <input type="number" id="editStudentXpT3" min="0" class="w-full px-2.5 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-xs text-cyan-400 font-bold outline-none" />
+          </div>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeEditStudentModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-400 hover:bg-emerald-300 text-slate-950 transition">
+            Salvar &amp; Sincronizar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CONFIRMAÇÃO ==================== -->
+  <div id="confirmDialogModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-panel space-y-4">
+      <h3 id="confirmDialogTitle" class="text-base font-extrabold text-white">Confirmar Ação</h3>
+      <p id="confirmDialogBody" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeConfirmDialog()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+          Cancelar
+        </button>
+        <button type="button" onclick="executeConfirmedAction()" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold bg-rose-500 hover:bg-rose-400 text-white transition">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NOTIFICAÇÕES TOAST ==================== -->
+  <div id="toastStack" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 pointer-events-none"></div>
+
+  <!-- ==================== SCRIPT DA APLICAÇÃO ==================== -->
+  <script>
+    const DEFAULT_CLOUD_SYNC_URL = "";
+
+    const TEACHER_PIN = '2027';
+    const DATA_CACHE_KEY = 'nexus_matematico_2027_cloud_cache_v1';
+    const CLOUD_URL_KEY = 'nexus_cloud_url';
+
+    const TRIMESTERS = {
+      T1: { key: 'T1', label: '1º Trimestre • 30 pts', shortLabel: '1º Trimestre', xpKey: 'xpT1' },
+      T2: { key: 'T2', label: '2º Trimestre • 30 pts', shortLabel: '2º Trimestre', xpKey: 'xpT2' },
+      T3: { key: 'T3', label: '3º Trimestre • 40 pts', shortLabel: '3º Trimestre', xpKey: 'xpT3' },
+    };
+
+    const OFFICIAL_MISSIONS = [
+      { id: 'visto', title: 'Visto de Caderno / Questão Gêmea', xp: 30, icon: '📘', tone: 'emerald' },
+      { id: 'relampago', title: 'Desafio Relâmpago', xp: 30, icon: '⚡', tone: 'emerald' },
+      { id: 'simave', title: 'Missão SIMAVE', xp: 30, icon: '📊', tone: 'emerald' },
+      { id: 'tutoria', title: 'Tutoria Nexus', xp: 30, icon: '🤝', tone: 'emerald' },
+      { id: 'recomposicao', title: 'Lista Dirigida de Recomposição', xp: 50, icon: '🧩', tone: 'amber' },
+      { id: 'pendencia', title: 'Pendência de Combinado', xp: -30, icon: '⚠️', tone: 'rose' },
+    ];
+
+    // Código pronto do Google Apps Script (armazena automaticamente em aba interna do Google Sheets)
+    const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Nexus_Nuvem_DB");
+  var payload = { students: [], logs: [], updatedAt: "" };
+  if (sheet) {
+    var raw = sheet.getRange("A1").getValue();
+    if (raw) {
+      try { payload = JSON.parse(raw); } catch (err) {}
+    }
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    if (data.pin !== "2027") {
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: false, error: "PIN inválido" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Nexus_Nuvem_DB") || ss.insertSheet("Nexus_Nuvem_DB");
+    var stateToSave = {
+      students: data.students || [],
+      logs: (data.logs || []).slice(0, 120),
+      updatedAt: new Date().toISOString()
+    };
+    sheet.getRange("A1").setValue(JSON.stringify(stateToSave));
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, updatedAt: stateToSave.updatedAt }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+    // ------------------------------------------------------------------
+    // 20 ESTUDANTES INICIAIS (5 POR TURMA: 201, 202, 203, 204)
+    // ------------------------------------------------------------------
+    function createInitialDataset() {
+      const students = [
+        // Turma 201 (5)
+        { id: 's201_1', realName: 'Gabriel Henrique Almeida', turma: '201', codinome: 'Euler_201', avatar: '🧙‍♂️', xpT1: 225, xpT2: 150, xpT3: 90 },
+        { id: 's201_2', realName: 'Mariana Costa Nogueira', turma: '201', codinome: 'Pythagoras_X', avatar: '📐', xpT1: 165, xpT2: 120, xpT3: 60 },
+        { id: 's201_3', realName: 'João Victor Martins', turma: '201', codinome: 'Delta_Force', avatar: '🚀', xpT1: 110, xpT2: 90, xpT3: 30 },
+        { id: 's201_4', realName: 'Sofia Beatriz Rezende', turma: '201', codinome: 'Seno_Cos201', avatar: '🌟', xpT1: 90, xpT2: 60, xpT3: 30 },
+        { id: 's201_5', realName: 'Lucas Gabriel Ferreira', turma: '201', codinome: 'Bhaskara_MG', avatar: '⚡', xpT1: 60, xpT2: 90, xpT3: 0 },
+
+        // Turma 202 (5)
+        { id: 's202_1', realName: 'Isabela Fernanda Silva', turma: '202', codinome: 'Hypatia_MG', avatar: '👑', xpT1: 240, xpT2: 180, xpT3: 120 },
+        { id: 's202_2', realName: 'Rafael Augusto Pereira', turma: '202', codinome: 'Matrix_X', avatar: '👾', xpT1: 180, xpT2: 140, xpT3: 90 },
+        { id: 's202_3', realName: 'Camila Vitória Santos', turma: '202', codinome: 'Estrela_202', avatar: '🦊', xpT1: 120, xpT2: 90, xpT3: 60 },
+        { id: 's202_4', realName: 'Matheus Oliveira Rocha', turma: '202', codinome: 'Vetor_Zero', avatar: '🎲', xpT1: 60, xpT2: 90, xpT3: 30 },
+        { id: 's202_5', realName: 'Helena Cristina Araújo', turma: '202', codinome: 'Cosseno_202', avatar: '🔭', xpT1: 95, xpT2: 110, xpT3: 60 },
+
+        // Turma 203 (5)
+        { id: 's203_1', realName: 'Pedro Lucas Carvalho', turma: '203', codinome: 'Gauss_Top', avatar: '🧠', xpT1: 215, xpT2: 160, xpT3: 110 },
+        { id: 's203_2', realName: 'Larissa Mendes Barbosa', turma: '203', codinome: 'Radiano_203', avatar: '⚡', xpT1: 150, xpT2: 120, xpT3: 90 },
+        { id: 's203_3', realName: 'Enzo Gabriel Teixeira', turma: '203', codinome: 'Pixel_BH', avatar: '🛡️', xpT1: 90, xpT2: 60, xpT3: 30 },
+        { id: 's203_4', realName: 'Beatriz Helena Gomes', turma: '203', codinome: 'Prisma_MG', avatar: '🎯', xpT1: 60, xpT2: 90, xpT3: 30 },
+        { id: 's203_5', realName: 'Daniel Henrique Moreira', turma: '203', codinome: 'Tangente_X', avatar: '🛸', xpT1: 110, xpT2: 90, xpT3: 60 },
+
+        // Turma 204 (5)
+        { id: 's204_1', realName: 'Thiago Henrique Dias', turma: '204', codinome: 'Fibonacci_204', avatar: '🔥', xpT1: 195, xpT2: 210, xpT3: 150 },
+        { id: 's204_2', realName: 'Julia Rodrigues Ribeiro', turma: '204', codinome: 'Nova_204', avatar: '🌟', xpT1: 140, xpT2: 120, xpT3: 90 },
+        { id: 's204_3', realName: 'Cauã Vinicius Moreira', turma: '204', codinome: 'Raio_204', avatar: '⚡', xpT1: 90, xpT2: 60, xpT3: 30 },
+        { id: 's204_4', realName: 'Lívia Eduarda Martins', turma: '204', codinome: 'Esfera_X', avatar: '📐', xpT1: 30, xpT2: 90, xpT3: 60 },
+        { id: 's204_5', realName: 'Arthur Miguel Vasconcelos', turma: '204', codinome: 'Newton_204', avatar: '🍎', xpT1: 120, xpT2: 150, xpT3: 90 },
+      ];
+
+      const logs = [
+        { id: 'lg_1', season: 'T1', turma: '202', codinome: 'Hypatia_MG', avatar: '👑', mission: 'Tutoria Nexus', xp: 30, time: 'Hoje, 10:15' },
+        { id: 'lg_2', season: 'T1', turma: '201', codinome: 'Euler_201', avatar: '🧙‍♂️', mission: 'Lista Dirigida de Recomposição', xp: 50, time: 'Hoje, 09:40' },
+        { id: 'lg_3', season: 'T1', turma: '203', codinome: 'Gauss_Top', avatar: '🧠', mission: 'Missão SIMAVE', xp: 30, time: 'Ontem, 11:20' },
+        { id: 'lg_4', season: 'T1', turma: '204', codinome: 'Fibonacci_204', avatar: '🔥', mission: 'Desafio Relâmpago', xp: 30, time: 'Ontem, 08:50' },
+        { id: 'lg_5', season: 'T1', turma: '202', codinome: 'Matrix_X', avatar: '👾', mission: 'Visto de Caderno / Questão Gêmea', xp: 30, time: 'Ontem, 08:10' },
+        { id: 'lg_6', season: 'T1', turma: '201', codinome: 'Pythagoras_X', avatar: '📐', mission: 'Lista Dirigida de Recomposição', xp: 50, time: 'Há 2 dias' },
+      ];
+
+      return { students, logs };
+    }
+
+    // ------------------------------------------------------------------
+    // ESTADO GLOBAL DA APLICAÇÃO
+    // ------------------------------------------------------------------
+    const state = {
+      cloudUrl: '',
+      cloudSynced: false,
+      lastSyncTime: '',
+      students: [],
+      logs: [],
+      season: 'T1',
+      classFilter: 'ALL',
+      publicTab: 'ranking',
+      selectedProfileCodinome: 'Euler_201',
+      isTeacher: false,
+      teacherTab: 'batch',
+      batchClass: '201',
+      batchSeason: 'T1',
+      batchMissionId: 'visto',
+      batchCheckedIds: new Set(),
+      undoSnapshot: null,
+      pendingConfirm: null,
+    };
+
+    function resolveCloudUrl() {
+      return (localStorage.getItem(CLOUD_URL_KEY) || DEFAULT_CLOUD_SYNC_URL || '').trim();
+    }
+
+    // ------------------------------------------------------------------
+    // CÁLCULO DE PATENTES (0-89, 90-149, 150-209, 210+)
+    // ------------------------------------------------------------------
+    function getPatenteInfo(xp) {
+      const safeXP = Math.max(0, Number(xp) || 0);
+      if (safeXP >= 210) {
+        return {
+          title: '🔥 Lenda',
+          badgeClass: 'bg-emerald-400/15 text-emerald-400 border border-emerald-400/40',
+          barClass: 'bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400',
+          nextTitle: null,
+          xpNeeded: 0,
+          progressPct: 100,
+        };
+      }
+      if (safeXP >= 150) {
+        return {
+          title: '👑 Mestre',
+          badgeClass: 'bg-amber-400/15 text-amber-400 border border-amber-400/40',
+          barClass: 'bg-amber-400',
+          nextTitle: '🔥 Lenda',
+          xpNeeded: 210 - safeXP,
+          progressPct: Math.min(100, Math.round(((safeXP - 150) / 60) * 100)),
+        };
+      }
+      if (safeXP >= 90) {
+        return {
+          title: '⚡ Estrategista',
+          badgeClass: 'bg-cyan-400/15 text-cyan-400 border border-cyan-400/40',
+          barClass: 'bg-cyan-400',
+          nextTitle: '👑 Mestre',
+          xpNeeded: 150 - safeXP,
+          progressPct: Math.min(100, Math.round(((safeXP - 90) / 60) * 100)),
+        };
+      }
+      return {
+        title: '🌱 Aprendiz',
+        badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700',
+        barClass: 'bg-slate-400',
+        nextTitle: '⚡ Estrategista',
+        xpNeeded: 90 - safeXP,
+        progressPct: Math.min(100, Math.round((safeXP / 90) * 100)),
+      };
+    }
+
+    function getStudentXP(student, seasonKey = state.season) {
+      const field = TRIMESTERS[seasonKey]?.xpKey || 'xpT1';
+      return Math.max(0, Number(student[field]) || 0);
+    }
+
+    function formatNowTime() {
+      const d = new Date();
+      return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ------------------------------------------------------------------
+    // CACHE LOCAL & SINCRONIZAÇÃO EM NUVEM (GET / POST APPS SCRIPT)
+    // ------------------------------------------------------------------
+    function loadCachedData() {
+      state.cloudUrl = resolveCloudUrl();
+      try {
+        const raw = localStorage.getItem(DATA_CACHE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.students) && parsed.students.length > 0) {
+            state.students = parsed.students;
+            state.logs = Array.isArray(parsed.logs) ? parsed.logs : [];
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao ler cache local:', e);
+      }
+      const initial = createInitialDataset();
+      state.students = initial.students;
+      state.logs = initial.logs;
+      saveLocalCache();
+    }
+
+    function saveLocalCache() {
+      try {
+        localStorage.setItem(
+          DATA_CACHE_KEY,
+          JSON.stringify({
+            students: state.students,
+            logs: state.logs,
+          })
+        );
+      } catch (e) {
+        console.error('Erro ao salvar cache local:', e);
+      }
+    }
+
+    function updateCloudStatusIndicators(pushingState = null) {
+      const headerBadge = document.getElementById('cloudStatusBadge');
+      const teacherBadge = document.getElementById('teacherPushStatus');
+
+      if (!state.cloudUrl) {
+        headerBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700';
+        headerBadge.textContent = '📱 Modo Local';
+        if (teacherBadge) {
+          teacherBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700';
+          teacherBadge.textContent = '📱 Modo Local (sem nuvem vinculada)';
+        }
+        return;
+      }
+
+      if (state.cloudSynced) {
+        headerBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/15 text-emerald-400 border border-emerald-400/35';
+        headerBadge.textContent = state.lastSyncTime
+          ? `☁️ Nuvem Sincronizada (${state.lastSyncTime})`
+          : '☁️ Nuvem Sincronizada';
+      } else {
+        headerBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/15 text-amber-400 border border-amber-400/35';
+        headerBadge.textContent = '☁️ Aguardando Nuvem';
+      }
+
+      if (teacherBadge && pushingState) {
+        if (pushingState === 'saving') {
+          teacherBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-400/15 text-cyan-400 border border-cyan-400/35';
+          teacherBadge.textContent = '🔄 Salvando na nuvem...';
+        } else if (pushingState === 'saved') {
+          teacherBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/15 text-emerald-400 border border-emerald-400/35';
+          teacherBadge.textContent = '☁️ Salvo na nuvem!';
+        } else if (pushingState === 'error') {
+          teacherBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/35';
+          teacherBadge.textContent = '⚠️ Salvo localmente (falha na nuvem)';
+        }
+      }
+    }
+
+    async function fetchFromCloud(silent = false) {
+      const url = state.cloudUrl;
+      if (!url) {
+        updateCloudStatusIndicators();
+        if (!silent) showToast('Modo Local ativo. Configure a URL da nuvem no Modo Professor.', 'info');
+        return false;
+      }
+
+      const icon = document.getElementById('manualSyncIcon');
+      if (icon && !silent) icon.classList.add('animate-spin');
+
+      try {
+        const sep = url.includes('?') ? '&' : '?';
+        const res = await fetch(`${url}${sep}_ts=${Date.now()}`, { method: 'GET' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (Array.isArray(data.students) && data.students.length > 0) {
+          state.students = data.students;
+          state.logs = Array.isArray(data.logs) ? data.logs : [];
+          saveLocalCache();
+        }
+        state.cloudSynced = true;
+        state.lastSyncTime = formatNowTime();
+        updateCloudStatusIndicators();
+        renderAll();
+        if (!silent) showToast('Dados atualizados da nuvem com sucesso!', 'success');
+        return true;
+      } catch (err) {
+        console.error('Erro ao buscar da nuvem:', err);
+        state.cloudSynced = false;
+        updateCloudStatusIndicators();
+        if (!silent) showToast('Não foi possível conectar à nuvem. Exibindo cache local.', 'warning');
+        return false;
+      } finally {
+        if (icon) icon.classList.remove('animate-spin');
+      }
+    }
+
+    async function pushToCloud(silent = false) {
+      saveLocalCache();
+      const url = state.cloudUrl;
+      if (!url) {
+        updateCloudStatusIndicators();
+        return false;
+      }
+
+      updateCloudStatusIndicators('saving');
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'sync_all',
+            pin: TEACHER_PIN,
+            students: state.students,
+            logs: state.logs,
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
+        if (result && result.ok === false) {
+          throw new Error(result.error || 'Erro recusado pelo script');
+        }
+        state.cloudSynced = true;
+        state.lastSyncTime = formatNowTime();
+        updateCloudStatusIndicators('saved');
+        if (!silent) showToast('☁️ Alterações salvas na nuvem!', 'success');
+        return true;
+      } catch (err) {
+        console.error('Erro ao enviar para nuvem:', err);
+        state.cloudSynced = false;
+        updateCloudStatusIndicators('error');
+        if (!silent) showToast('Salvo no aparelho, mas houve falha ao enviar para a nuvem.', 'warning');
+        return false;
+      }
+    }
+
+    function manualCloudRefresh() {
+      fetchFromCloud(false);
+    }
+
+    // ------------------------------------------------------------------
+    // NAVEGAÇÃO (TEMPORADA, TURMA, ABAS PÚBLICAS, MODO PROFESSOR)
+    // ------------------------------------------------------------------
+    function setSeason(seasonKey) {
+      state.season = seasonKey;
+      state.batchSeason = seasonKey;
+      renderAll();
+    }
+
+    function setClassFilter(turma) {
+      state.classFilter = turma;
+      if (turma !== 'ALL') {
+        const current = state.students.find((s) => s.codinome.toLowerCase() === state.selectedProfileCodinome.toLowerCase());
+        const inTurma = state.students.filter((s) => s.turma === turma);
+        if ((!current || current.turma !== turma) && inTurma.length > 0) {
+          state.selectedProfileCodinome = inTurma[0].codinome;
+        }
+      }
+      renderAll();
+    }
+
+    function setPublicTab(tabKey) {
+      state.publicTab = tabKey;
+      renderPublicView();
+    }
+
+    function openPlayerProfile(codinome) {
+      state.selectedProfileCodinome = codinome;
+      state.publicTab = 'profile';
+      document.getElementById('profileSearchInput').value = codinome;
+      renderPublicView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleTeacherButton() {
+      if (state.isTeacher) {
+        exitTeacherMode();
+      } else {
+        document.getElementById('pinInputField').value = '';
+        document.getElementById('pinErrorMsg').classList.add('hidden');
+        document.getElementById('pinModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('pinInputField').focus(), 60);
+      }
+    }
+
+    function closePinModal() {
+      document.getElementById('pinModal').classList.add('hidden');
+    }
+
+    function verifyTeacherPin(e) {
+      e.preventDefault();
+      const val = document.getElementById('pinInputField').value.trim();
+      if (val === TEACHER_PIN) {
+        closePinModal();
+        state.isTeacher = true;
+        renderAll();
+        showToast('🔐 Modo Professor ativo! Nomes reais visíveis apenas nesta área.', 'success');
+      } else {
+        document.getElementById('pinErrorMsg').classList.remove('hidden');
+        document.getElementById('pinInputField').value = '';
+        document.getElementById('pinInputField').focus();
+      }
+    }
+
+    function exitTeacherMode() {
+      state.isTeacher = false;
+      renderAll();
+      showToast('Painel Público LGPD ativado.', 'info');
+    }
+
+    function setTeacherTab(tabKey) {
+      state.teacherTab = tabKey;
+      renderTeacherView();
+    }
+
+    // ------------------------------------------------------------------
+    // RENDERIZAÇÃO DO CABEÇALHO E VISÃO PÚBLICA
+    // ------------------------------------------------------------------
+    function renderHeader() {
+      updateCloudStatusIndicators();
+
+      document.querySelectorAll('.season-tab-btn').forEach((btn) => {
+        const active = btn.dataset.season === state.season;
+        btn.className = active
+          ? 'season-tab-btn px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-center bg-cyan-400 text-slate-950 shadow-sm'
+          : 'season-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-center text-slate-400 hover:text-white hover:bg-slate-900';
+      });
+
+      document.querySelectorAll('.turma-tab-btn').forEach((btn) => {
+        const active = btn.dataset.turma === state.classFilter;
+        btn.className = active
+          ? 'turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-extrabold transition bg-emerald-400 text-slate-950'
+          : 'turma-tab-btn px-2.5 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+      });
+
+      const tBtn = document.getElementById('btnTeacherMode');
+      const tIcon = document.getElementById('teacherBtnIcon');
+      const tText = document.getElementById('teacherBtnText');
+      if (state.isTeacher) {
+        tBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-md transition active:scale-95';
+        tIcon.textContent = '👁️';
+        tText.textContent = 'Ver Painel Público';
+      } else {
+        tBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md shadow-amber-500/15 transition active:scale-95';
+        tIcon.textContent = '🔐';
+        tText.textContent = 'Modo Professor';
+      }
+    }
+
+    function renderPublicView() {
+      document.querySelectorAll('.pub-tab-btn').forEach((btn) => {
+        const active = btn.dataset.pubtab === state.publicTab;
+        btn.className = active
+          ? 'pub-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-left sm:text-center bg-cyan-400 text-slate-950 shadow-sm'
+          : 'pub-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-left sm:text-center text-slate-400 hover:text-white';
+      });
+
+      document.getElementById('tabRankingPanel').classList.toggle('hidden', state.publicTab !== 'ranking');
+      document.getElementById('tabProfilePanel').classList.toggle('hidden', state.publicTab !== 'profile');
+      document.getElementById('tabRulesPanel').classList.toggle('hidden', state.publicTab !== 'rules');
+
+      if (state.publicTab === 'ranking') renderRankingTab();
+      if (state.publicTab === 'profile') renderProfileTab();
+    }
+
+    function renderRankingTab() {
+      const seasonObj = TRIMESTERS[state.season];
+      const scopedStudents = state.students
+        .filter((s) => state.classFilter === 'ALL' || s.turma === state.classFilter)
+        .sort((a, b) => {
+          const diff = getStudentXP(b) - getStudentXP(a);
+          return diff !== 0 ? diff : a.codinome.localeCompare(b.codinome);
+        });
+
+      // 1. Meta Coletiva (80% com 90+ XP)
+      const total = scopedStudents.length;
+      const estrategistas = scopedStudents.filter((s) => getStudentXP(s) >= 90).length;
+      const pct = total > 0 ? Math.round((estrategistas / total) * 100) : 0;
+      const scopeLabel = state.classFilter === 'ALL' ? 'Todas as Turmas (201–204)' : `Turma ${state.classFilter}`;
+
+      document.getElementById('goalScopeTitle').textContent = `${scopeLabel} • ${seasonObj.shortLabel}`;
+      document.getElementById('goalPctDisplay').textContent = `${pct}%`;
+      document.getElementById('goalRatioDisplay').textContent = `(${estrategistas}/${total} jogadores)`;
+      document.getElementById('goalProgressBar').style.width = `${pct}%`;
+
+      const statusEl = document.getElementById('goalStatusText');
+      if (total === 0) {
+        statusEl.textContent = 'Nenhum estudante cadastrado nesta turma ainda.';
+        statusEl.className = 'text-slate-400';
+      } else if (pct >= 80) {
+        statusEl.textContent = '🎉 META COLETIVA DESBLOQUEADA! 10 min de música ambiente liberados na revisão!';
+        statusEl.className = 'text-emerald-400 font-extrabold';
+      } else {
+        const missing = Math.ceil(total * 0.8) - estrategistas;
+        statusEl.textContent = `Falta(m) ${missing} jogador(es) alcançar(em) 90 XP para liberar a recompensa da turma.`;
+        statusEl.className = 'text-slate-300';
+      }
+
+      // 2. Pódio Top 3
+      document.getElementById('podiumSeasonLabel').textContent = seasonObj.shortLabel;
+      const podiumEl = document.getElementById('podiumContainer');
+      const top3 = scopedStudents.slice(0, 3);
+      const podiumStyles = [
+        {
+          medal: '🥇',
+          place: '1º Lugar • Ouro',
+          cardBorder: 'border-amber-400/50 bg-gradient-to-b from-amber-400/15 via-slate-900 to-slate-900',
+          xpColor: 'text-amber-400',
+        },
+        {
+          medal: '🥈',
+          place: '2º Lugar • Prata',
+          cardBorder: 'border-slate-400/40 bg-gradient-to-b from-slate-400/10 via-slate-900 to-slate-900',
+          xpColor: 'text-cyan-400',
+        },
+        {
+          medal: '🥉',
+          place: '3º Lugar • Bronze',
+          cardBorder: 'border-orange-400/40 bg-gradient-to-b from-orange-400/10 via-slate-900 to-slate-900',
+          xpColor: 'text-emerald-400',
+        },
+      ];
+
+      if (top3.length === 0) {
+        podiumEl.innerHTML = `<div class="col-span-3 p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center text-xs text-slate-400">Sem jogadores nesta turma.</div>`;
+      } else {
+        podiumEl.innerHTML = top3
+          .map((st, idx) => {
+            const style = podiumStyles[idx];
+            const xp = getStudentXP(st);
+            const pat = getPatenteInfo(xp);
+            return `
+              <div
+                onclick="openPlayerProfile('${escapeHtml(st.codinome)}')"
+                class="cursor-pointer rounded-2xl border p-4 sm:p-5 shadow-xl transition hover:-translate-y-0.5 ${style.cardBorder}"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-slate-300">${style.medal} ${style.place}</span>
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-950/80 text-slate-300 border border-slate-800">
+                    Turma ${escapeHtml(st.turma)}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-2xl shrink-0">
+                      ${escapeHtml(st.avatar)}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-base font-extrabold text-white truncate">${escapeHtml(st.codinome)}</p>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold mt-1 ${pat.badgeClass}">
+                        ${pat.title}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <span class="font-mono text-2xl font-extrabold ${style.xpColor}">${xp}</span>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase">XP</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+      }
+
+      // 3. Tabela Completa com Busca Rápida
+      const searchQ = (document.getElementById('rankingSearchInput')?.value || '').trim().toLowerCase();
+      const tbody = document.getElementById('rankingTableBody');
+
+      const rowsData = scopedStudents
+        .map((st, idx) => ({ st, pos: idx + 1 }))
+        .filter(({ st }) => !searchQ || st.codinome.toLowerCase().includes(searchQ));
+
+      if (rowsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-xs text-slate-500">Nenhum codinome encontrado.</td></tr>`;
+      } else {
+        tbody.innerHTML = rowsData
+          .map(({ st, pos }) => {
+            const xp = getStudentXP(st);
+            const pat = getPatenteInfo(xp);
+            const posBadge =
+              pos === 1
+                ? '🥇'
+                : pos === 2
+                ? '🥈'
+                : pos === 3
+                ? '🥉'
+                : `<span class="font-mono font-bold text-slate-400">#${pos}</span>`;
+
+            const c1 = xp >= 90 ? '<span title="Card Vida Extra (+1 dia)">🎟️</span>' : '';
+            const c2 = xp >= 150 ? '<span title="Card Consulta Express (1 dica)">💡</span>' : '';
+            const c3 = xp >= 210 ? '<span title="Selo Tutor Nexus">🛡️</span>' : '';
+            const cardsHtml = c1 || c2 || c3 ? `<div class="inline-flex items-center gap-1 text-xs">${c1}${c2}${c3}</div>` : `<span class="text-slate-600 text-xs">—</span>`;
+
+            return `
+              <tr onclick="openPlayerProfile('${escapeHtml(st.codinome)}')" class="cursor-pointer hover:bg-slate-800/50 transition">
+                <td class="py-3 pl-4 pr-2 text-center">${posBadge}</td>
+                <td class="py-3 px-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg shrink-0">${escapeHtml(st.avatar)}</span>
+                    <span class="font-bold text-white">${escapeHtml(st.codinome)}</span>
+                  </div>
+                </td>
+                <td class="py-3 px-2 text-center">
+                  <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                    ${escapeHtml(st.turma)}
+                  </span>
+                </td>
+                <td class="py-3 px-3 min-w-[155px]">
+                  <div class="flex items-center justify-between gap-2 mb-1">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold ${pat.badgeClass}">
+                      ${pat.title}
+                    </span>
+                    <span class="font-mono text-[10px] text-slate-400">${pat.progressPct}%</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                    <div class="h-full ${pat.barClass} rounded-full" style="width: ${pat.progressPct}%"></div>
+                  </div>
+                </td>
+                <td class="py-3 px-2 text-center">${cardsHtml}</td>
+                <td class="py-3 pl-2 pr-4 text-right whitespace-nowrap">
+                  <span class="font-mono font-extrabold text-cyan-400">${xp}</span>
+                  <span class="text-[10px] font-bold text-slate-500">XP</span>
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      // 4. Feed Últimas Missões Validadas
+      const feedEl = document.getElementById('recentLogsFeed');
+      const filteredLogs = state.logs
+        .filter((lg) => lg.season === state.season)
+        .filter((lg) => state.classFilter === 'ALL' || lg.turma === state.classFilter)
+        .slice(0, 18);
+
+      if (filteredLogs.length === 0) {
+        feedEl.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">Nenhuma missão registrada neste filtro ainda.</div>`;
+      } else {
+        feedEl.innerHTML = filteredLogs
+          .map((lg) => {
+            const isNeg = Number(lg.xp) < 0;
+            const xpStr = Number(lg.xp) > 0 ? `+${lg.xp} XP` : `${lg.xp} XP`;
+            const xpBadge = isNeg
+              ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+              : Number(lg.xp) >= 50
+              ? 'bg-amber-400/15 text-amber-400 border-amber-400/30'
+              : 'bg-emerald-400/15 text-emerald-400 border-emerald-400/30';
+
+            return `
+              <div
+                onclick="openPlayerProfile('${escapeHtml(lg.codinome)}')"
+                class="p-3.5 hover:bg-slate-800/40 cursor-pointer transition flex items-center justify-between gap-2.5"
+              >
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="text-lg shrink-0">${escapeHtml(lg.avatar || '📐')}</span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-extrabold text-white truncate">
+                      ${escapeHtml(lg.codinome)} <span class="text-slate-500 font-normal">• ${escapeHtml(lg.turma)}</span>
+                    </p>
+                    <p class="text-xs text-slate-400 truncate">${escapeHtml(lg.mission)}</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${escapeHtml(lg.time || '')}</p>
+                  </div>
+                </div>
+                <span class="font-mono px-2.5 py-1 rounded-lg text-[11px] font-extrabold border shrink-0 ${xpBadge}">
+                  ${xpStr}
+                </span>
+              </div>
+            `;
+          })
+          .join('');
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // ABA 2: MEU PERFIL & CARDS
+    // ------------------------------------------------------------------
+    function renderProfileTab() {
+      const scoped = state.students
+        .filter((s) => state.classFilter === 'ALL' || s.turma === state.classFilter)
+        .sort((a, b) => a.codinome.localeCompare(b.codinome));
+
+      const dropdown = document.getElementById('profileSelectDropdown');
+      const optionsSource = scoped.length > 0 ? scoped : state.students;
+      dropdown.innerHTML = optionsSource
+        .map(
+          (s) =>
+            `<option value="${escapeHtml(s.codinome)}" ${
+              s.codinome.toLowerCase() === state.selectedProfileCodinome.toLowerCase() ? 'selected' : ''
+            }>${escapeHtml(s.avatar)} ${escapeHtml(s.codinome)} (Turma ${escapeHtml(s.turma)})</option>`
+        )
+        .join('');
+
+      const st = state.students.find(
+        (s) => s.codinome.toLowerCase() === state.selectedProfileCodinome.toLowerCase()
+      );
+
+      const cardContainer = document.getElementById('studentProfileCard');
+      const historyContainer = document.getElementById('studentPersonalHistory');
+
+      if (!st) {
+        cardContainer.innerHTML = `
+          <div class="p-8 text-center space-y-2">
+            <div class="text-3xl">🕵️</div>
+            <h3 class="text-base font-extrabold text-white">Codinome "${escapeHtml(state.selectedProfileCodinome)}" não encontrado</h3>
+            <p class="text-xs text-slate-400">Verifique a grafia exata ou escolha na lista acima.</p>
+          </div>
+        `;
+        historyContainer.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">Sem histórico para exibir.</div>`;
+        return;
+      }
+
+      const seasonObj = TRIMESTERS[state.season];
+      const xp = getStudentXP(st);
+      const pat = getPatenteInfo(xp);
+
+      const classRanking = state.students
+        .filter((s) => s.turma === st.turma)
+        .sort((a, b) => getStudentXP(b) - getStudentXP(a));
+      const posTurma = classRanking.findIndex((s) => s.id === st.id) + 1;
+
+      const cardVidaExtra = xp >= 90;
+      const cardConsulta = xp >= 150;
+      const seloTutor = xp >= 210;
+
+      cardContainer.innerHTML = `
+        <div class="bg-gradient-to-r from-slate-900 via-cyan-950/60 to-slate-900 p-5 border-b border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-14 h-14 rounded-2xl bg-slate-950 border border-cyan-400/40 flex items-center justify-center text-3xl shrink-0">
+              ${escapeHtml(st.avatar)}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-lg sm:text-xl font-extrabold text-white truncate">${escapeHtml(st.codinome)}</h3>
+                <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-800 text-cyan-400 border border-slate-700">
+                  Turma ${escapeHtml(st.turma)}
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">
+                ${seasonObj.shortLabel} • <strong class="text-emerald-400">#${posTurma}º</strong> na Turma ${escapeHtml(st.turma)}
+              </p>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="font-mono text-3xl font-extrabold text-cyan-400 leading-none">${xp}</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">XP Atual</div>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-5">
+          <!-- Barra de Evolução da Patente -->
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-extrabold ${pat.badgeClass}">
+                ${pat.title}
+              </span>
+              <span class="text-xs text-slate-400">
+                ${
+                  pat.nextTitle
+                    ? `Faltam <strong class="font-mono text-white">${pat.xpNeeded} XP</strong> para ${pat.nextTitle}`
+                    : '<span class="text-amber-400 font-bold">🏆 Nível Máximo Alcançado!</span>'
+                }
+              </span>
+            </div>
+            <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+              <div class="h-full ${pat.barClass} rounded-full transition-all duration-500" style="width: ${pat.progressPct}%"></div>
+            </div>
+          </div>
+
+          <!-- Os 3 Cards Desbloqueáveis -->
+          <div class="space-y-2.5">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+              Cards &amp; Recompensas Desbloqueáveis
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Card Vida Extra -->
+              <div class="p-3.5 rounded-2xl border transition ${
+                cardVidaExtra
+                  ? 'bg-cyan-400/10 border-cyan-400/40'
+                  : 'bg-slate-950/80 border-slate-800 opacity-65'
+              }">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xl">${cardVidaExtra ? '🎟️' : '🔒'}</span>
+                  <span class="font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                    cardVidaExtra ? 'bg-emerald-400/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
+                  }">
+                    ${cardVidaExtra ? 'ATIVO' : '90+ XP'}
+                  </span>
+                </div>
+                <p class="text-xs font-extrabold text-white">Card "Vida Extra"</p>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">+1 dia de prazo em tarefa sem desconto de XP.</p>
+              </div>
+
+              <!-- Card Consulta Express -->
+              <div class="p-3.5 rounded-2xl border transition ${
+                cardConsulta
+                  ? 'bg-amber-400/10 border-amber-400/40'
+                  : 'bg-slate-950/80 border-slate-800 opacity-65'
+              }">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xl">${cardConsulta ? '💡' : '🔒'}</span>
+                  <span class="font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                    cardConsulta ? 'bg-amber-400/20 text-amber-400' : 'bg-slate-800 text-slate-400'
+                  }">
+                    ${cardConsulta ? 'ATIVO' : '150+ XP'}
+                  </span>
+                </div>
+                <p class="text-xs font-extrabold text-white">Card "Consulta Express"</p>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">1 dica conceitual direta da professora durante a prova.</p>
+              </div>
+
+              <!-- Selo Tutor Nexus -->
+              <div class="p-3.5 rounded-2xl border transition ${
+                seloTutor
+                  ? 'bg-emerald-400/10 border-emerald-400/40'
+                  : 'bg-slate-950/80 border-slate-800 opacity-65'
+              }">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xl">${seloTutor ? '🛡️' : '🔒'}</span>
+                  <span class="font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                    seloTutor ? 'bg-emerald-400/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
+                  }">
+                    ${seloTutor ? 'ATIVO' : '210+ XP'}
+                  </span>
+                </div>
+                <p class="text-xs font-extrabold text-white">Selo "Tutor Nexus"</p>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">Lugar preferencial nas aulas de exercícios e destaque oficial.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Histórico do Estudante
+      const personalLogs = state.logs.filter(
+        (lg) => lg.codinome.toLowerCase() === st.codinome.toLowerCase() && lg.season === state.season
+      );
+
+      if (personalLogs.length === 0) {
+        historyContainer.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">Nenhuma missão registrada individualmente no log deste trimestre ainda.</div>`;
+      } else {
+        historyContainer.innerHTML = personalLogs
+          .map((lg) => {
+            const xpStr = Number(lg.xp) > 0 ? `+${lg.xp} XP` : `${lg.xp} XP`;
+            const badgeColor = Number(lg.xp) < 0 ? 'text-rose-400 bg-rose-500/15 border-rose-500/30' : 'text-emerald-400 bg-emerald-400/15 border-emerald-400/30';
+            return `
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs sm:text-sm font-bold text-white">${escapeHtml(lg.mission)}</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(lg.time || '')}</p>
+                </div>
+                <span class="font-mono px-2.5 py-1 rounded-lg text-xs font-extrabold border shrink-0 ${badgeColor}">
+                  ${xpStr}
+                </span>
+              </div>
+            `;
+          })
+          .join('');
+      }
+    }
+
+    function onProfileSearch(val) {
+      const q = val.trim();
+      if (!q) return;
+      const exact = state.students.find((s) => s.codinome.toLowerCase() === q.toLowerCase());
+      const partial = state.students.find((s) => s.codinome.toLowerCase().includes(q.toLowerCase()));
+      state.selectedProfileCodinome = exact ? exact.codinome : partial ? partial.codinome : q;
+      renderProfileTab();
+    }
+
+    function selectProfileCodename(codinome) {
+      state.selectedProfileCodinome = codinome;
+      document.getElementById('profileSearchInput').value = codinome;
+      renderProfileTab();
+    }
+
+    // ------------------------------------------------------------------
+    // RENDERIZAÇÃO E AÇÕES DO MODO PROFESSOR
+    // ------------------------------------------------------------------
+    function renderTeacherView() {
+      document.querySelectorAll('.teacher-tab-btn').forEach((btn) => {
+        const active = btn.dataset.ttab === state.teacherTab;
+        btn.className = active
+          ? 'teacher-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-cyan-400 text-slate-950'
+          : 'teacher-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700';
+      });
+
+      document.getElementById('teacherBatchTab').classList.toggle('hidden', state.teacherTab !== 'batch');
+      document.getElementById('teacherRosterTab').classList.toggle('hidden', state.teacherTab !== 'roster');
+      document.getElementById('teacherCloudTab').classList.toggle('hidden', state.teacherTab !== 'cloud');
+      document.getElementById('totalStudentsCount').textContent = state.students.length;
+
+      const undoBtn = document.getElementById('btnUndoAction');
+      undoBtn.classList.toggle('hidden', !state.undoSnapshot);
+
+      if (state.teacherTab === 'batch') renderBatchLauncher();
+      if (state.teacherTab === 'roster') renderRosterManagementTable();
+      if (state.teacherTab === 'cloud') renderCloudConfigPanel();
+    }
+
+    function setBatchClass(turma) {
+      state.batchClass = turma;
+      state.batchCheckedIds.clear();
+      renderBatchLauncher();
+    }
+
+    function setBatchSeason(seasonKey) {
+      state.batchSeason = seasonKey;
+      renderBatchLauncher();
+    }
+
+    function setBatchMission(missionId) {
+      state.batchMissionId = missionId;
+      document.getElementById('useCustomMissionCheck').checked = false;
+      document.getElementById('customMissionFields').classList.add('hidden');
+      renderBatchLauncher();
+    }
+
+    function toggleCustomMissionInputs() {
+      const checked = document.getElementById('useCustomMissionCheck').checked;
+      document.getElementById('customMissionFields').classList.toggle('hidden', !checked);
+    }
+
+    function renderBatchLauncher() {
+      document.querySelectorAll('.batch-class-btn').forEach((btn) => {
+        const active = btn.dataset.bclass === state.batchClass;
+        btn.className = active
+          ? 'batch-class-btn py-2.5 rounded-xl text-sm font-extrabold border transition bg-cyan-400 text-slate-950 border-cyan-300'
+          : 'batch-class-btn py-2.5 rounded-xl text-sm font-bold border transition bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-800';
+      });
+
+      document.querySelectorAll('.batch-season-btn').forEach((btn) => {
+        const active = btn.dataset.bseason === state.batchSeason;
+        btn.className = active
+          ? 'batch-season-btn py-2 rounded-xl text-xs font-extrabold border transition bg-amber-400 text-slate-950 border-amber-300'
+          : 'batch-season-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-800';
+      });
+
+      document.getElementById('batchTurmaLabel').textContent = state.batchClass;
+      document.getElementById('batchTrimLabel').textContent = TRIMESTERS[state.batchSeason].shortLabel;
+
+      const missionsBox = document.getElementById('batchMissionButtons');
+      missionsBox.innerHTML = OFFICIAL_MISSIONS.map((m) => {
+        const selected = m.id === state.batchMissionId;
+        const badgeStyle =
+          m.tone === 'amber'
+            ? 'bg-amber-400/20 text-amber-400 border-amber-400/40'
+            : m.tone === 'rose'
+            ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+            : 'bg-emerald-400/15 text-emerald-400 border-emerald-400/30';
+
+        return `
+          <button
+            type="button"
+            onclick="setBatchMission('${m.id}')"
+            class="w-full text-left p-3 rounded-xl border transition flex items-center justify-between gap-2 ${
+              selected
+                ? 'bg-cyan-400/15 border-cyan-400 text-white'
+                : 'bg-slate-950/90 border-slate-800 hover:border-slate-700 text-slate-300'
+            }"
+          >
+            <span class="text-xs sm:text-sm font-bold truncate">${m.icon} ${m.title}</span>
+            <span class="font-mono px-2.5 py-0.5 rounded-lg text-xs font-extrabold border shrink-0 ${badgeStyle}">
+              ${m.xp > 0 ? `+${m.xp}` : m.xp} XP
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      renderBatchStudentList();
+    }
+
+    function renderBatchStudentList() {
+      const container = document.getElementById('batchStudentChecklist');
+      const query = (document.getElementById('batchFilterInput')?.value || '').trim().toLowerCase();
+
+      const list = state.students
+        .filter((s) => s.turma === state.batchClass)
+        .filter(
+          (s) =>
+            !query ||
+            s.realName.toLowerCase().includes(query) ||
+            s.codinome.toLowerCase().includes(query)
+        )
+        .sort((a, b) => a.realName.localeCompare(b.realName));
+
+      document.getElementById('batchSelectedCounter').textContent = state.batchCheckedIds.size;
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">Nenhum estudante encontrado na Turma ${state.batchClass}.</div>`;
+        return;
+      }
+
+      container.innerHTML = list
+        .map((st) => {
+          const checked = state.batchCheckedIds.has(st.id);
+          const xp = getStudentXP(st, state.batchSeason);
+          return `
+            <div
+              onclick="toggleBatchStudent('${st.id}')"
+              class="flex items-center justify-between gap-3 p-3.5 sm:p-4 cursor-pointer select-none transition ${
+                checked ? 'bg-cyan-400/10' : 'hover:bg-slate-800/50'
+              }"
+            >
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-7 h-7 rounded-xl border-2 flex items-center justify-center shrink-0 transition text-sm ${
+                  checked
+                    ? 'bg-cyan-400 border-cyan-300 text-slate-950 font-black'
+                    : 'border-slate-600 bg-slate-950'
+                }">
+                  ${checked ? '✓' : ''}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-extrabold text-white truncate">${escapeHtml(st.realName)}</p>
+                  <p class="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <span>${escapeHtml(st.avatar)}</span>
+                    <span class="font-semibold text-cyan-400">${escapeHtml(st.codinome)}</span>
+                  </p>
+                </div>
+              </div>
+              <span class="font-mono px-2.5 py-1 rounded-xl text-xs font-extrabold bg-slate-950 text-slate-300 border border-slate-800 shrink-0">
+                ${xp} XP
+              </span>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function toggleBatchStudent(id) {
+      if (state.batchCheckedIds.has(id)) {
+        state.batchCheckedIds.delete(id);
+      } else {
+        state.batchCheckedIds.add(id);
+      }
+      renderBatchStudentList();
+    }
+
+    function selectAllBatchStudents(selectAll) {
+      const list = state.students.filter((s) => s.turma === state.batchClass);
+      if (selectAll) {
+        list.forEach((s) => state.batchCheckedIds.add(s.id));
+      } else {
+        list.forEach((s) => state.batchCheckedIds.delete(s.id));
+      }
+      renderBatchStudentList();
+    }
+
+    async function submitBatchXP() {
+      const ids = Array.from(state.batchCheckedIds);
+      if (ids.length === 0) {
+        showToast('Marque pelo menos 1 estudante para registrar XP.', 'warning');
+        return;
+      }
+
+      let missionTitle = '';
+      let xpDelta = 0;
+
+      if (document.getElementById('useCustomMissionCheck').checked) {
+        missionTitle = document.getElementById('customMissionTitle').value.trim() || 'Missão Especial';
+        xpDelta = Number(document.getElementById('customMissionXP').value) || 0;
+      } else {
+        const m = OFFICIAL_MISSIONS.find((item) => item.id === state.batchMissionId) || OFFICIAL_MISSIONS[0];
+        missionTitle = m.title;
+        xpDelta = m.xp;
+      }
+
+      state.undoSnapshot = JSON.stringify({ students: state.students, logs: state.logs });
+
+      const xpField = TRIMESTERS[state.batchSeason].xpKey;
+      const nowStr = `Hoje, ${formatNowTime()}`;
+      const newLogs = [];
+
+      state.students = state.students.map((st) => {
+        if (!state.batchCheckedIds.has(st.id)) return st;
+        const nextXP = Math.max(0, (Number(st[xpField]) || 0) + xpDelta);
+        newLogs.push({
+          id: `lg_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          season: state.batchSeason,
+          turma: st.turma,
+          codinome: st.codinome,
+          avatar: st.avatar,
+          mission: missionTitle,
+          xp: xpDelta,
+          time: nowStr,
+        });
+        return { ...st, [xpField]: nextXP };
+      });
+
+      state.logs = [...newLogs, ...state.logs].slice(0, 120);
+      state.batchCheckedIds.clear();
+      renderAll();
+
+      const xpLabel = xpDelta > 0 ? `+${xpDelta} XP` : `${xpDelta} XP`;
+      showToast(`${xpLabel} aplicado para ${ids.length} estudante(s)!`, 'success');
+      await pushToCloud(true);
+    }
+
+    async function undoLastTeacherAction() {
+      if (!state.undoSnapshot) return;
+      const restored = JSON.parse(state.undoSnapshot);
+      state.students = restored.students;
+      state.logs = restored.logs;
+      state.undoSnapshot = null;
+      renderAll();
+      showToast('↩️ Último lançamento desfeito!', 'info');
+      await pushToCloud(true);
+    }
+
+    // ------------------------------------------------------------------
+    // GESTÃO DE TURMAS: ADICIONAR, IMPORTAR, EDITAR, EXCLUIR, RESETAR
+    // ------------------------------------------------------------------
+    async function handleAddStudent(e) {
+      e.preventDefault();
+      const realName = document.getElementById('newStudentRealName').value.trim();
+      const turma = document.getElementById('newStudentTurma').value;
+      const avatar = document.getElementById('newStudentAvatar').value;
+      const codinome = document.getElementById('newStudentCodinome').value.trim();
+
+      if (!realName || !codinome) return;
+      if (state.students.some((s) => s.codinome.toLowerCase() === codinome.toLowerCase())) {
+        showToast(`O codinome "${codinome}" já está em uso!`, 'warning');
+        return;
+      }
+
+      state.students.push({
+        id: `st_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        realName,
+        turma,
+        codinome,
+        avatar,
+        xpT1: 0,
+        xpT2: 0,
+        xpT3: 0,
+      });
+
+      document.getElementById('newStudentRealName').value = '';
+      document.getElementById('newStudentCodinome').value = '';
+      renderAll();
+      showToast(`Codinome ${codinome} adicionado na Turma ${turma}!`, 'success');
+      await pushToCloud(true);
+    }
+
+    async function handleBulkImport() {
+      const raw = document.getElementById('bulkImportTextarea').value.trim();
+      if (!raw) {
+        showToast('Cole pelo menos uma linha para importar.', 'warning');
+        return;
+      }
+
+      const lines = raw.split(/\r?\n/).filter((l) => l.trim().length > 0);
+      let importedCount = 0;
+
+      lines.forEach((line) => {
+        const parts = line.split(';').map((p) => p.trim());
+        if (parts.length < 3) return;
+        const [realName, turmaRaw, codinome, avatarRaw] = parts;
+        const turma = ['201', '202', '203', '204'].includes(turmaRaw) ? turmaRaw : '201';
+        const avatar = avatarRaw || '📐';
+
+        if (!realName || !codinome) return;
+        if (state.students.some((s) => s.codinome.toLowerCase() === codinome.toLowerCase())) return;
+
+        state.students.push({
+          id: `st_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          realName,
+          turma,
+          codinome,
+          avatar,
+          xpT1: 0,
+          xpT2: 0,
+          xpT3: 0,
+        });
+        importedCount++;
+      });
+
+      if (importedCount === 0) {
+        showToast('Nenhum registro novo válido encontrado (verifique duplicatas ou formato).', 'warning');
+        return;
+      }
+
+      document.getElementById('bulkImportTextarea').value = '';
+      renderAll();
+      showToast(`${importedCount} estudante(s) importado(s) com sucesso!`, 'success');
+      await pushToCloud(true);
+    }
+
+    function renderRosterManagementTable() {
+      const tbody = document.getElementById('rosterManagementBody');
+      const q = (document.getElementById('rosterSearchInput')?.value || '').trim().toLowerCase();
+
+      const filtered = state.students
+        .filter(
+          (s) =>
+            !q ||
+            s.realName.toLowerCase().includes(q) ||
+            s.codinome.toLowerCase().includes(q) ||
+            s.turma.includes(q)
+        )
+        .sort((a, b) => a.turma.localeCompare(b.turma) || a.realName.localeCompare(b.realName));
+
+      tbody.innerHTML = filtered
+        .map(
+          (st) => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="py-2.5 px-3 font-bold text-slate-300">${escapeHtml(st.turma)}</td>
+            <td class="py-2.5 px-3 font-bold text-white">${escapeHtml(st.realName)}</td>
+            <td class="py-2.5 px-3 font-semibold text-cyan-400">${escapeHtml(st.avatar)} ${escapeHtml(st.codinome)}</td>
+            <td class="py-2.5 px-3 text-right font-mono text-xs text-slate-300">${st.xpT1} / ${st.xpT2} / ${st.xpT3}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <button
+                type="button"
+                onclick="openEditStudentModal('${st.id}')"
+                class="px-2 py-1 rounded-lg text-cyan-400 hover:bg-cyan-400/15 transition"
+                title="Editar"
+              >
+                ✏️
+              </button>
+              <button
+                type="button"
+                onclick="openConfirmDialog('deleteStudent', '${st.id}')"
+                class="px-2 py-1 rounded-lg text-rose-400 hover:bg-rose-500/15 transition"
+                title="Excluir"
+              >
+                🗑️
+              </button>
+            </td>
+          </tr>
+        `
+        )
+        .join('');
+    }
+
+    function openEditStudentModal(id) {
+      const st = state.students.find((s) => s.id === id);
+      if (!st) return;
+      document.getElementById('editStudentId').value = st.id;
+      document.getElementById('editStudentRealName').value = st.realName;
+      document.getElementById('editStudentTurma').value = st.turma;
+      document.getElementById('editStudentAvatar').value = st.avatar;
+      document.getElementById('editStudentCodinome').value = st.codinome;
+      document.getElementById('editStudentXpT1').value = st.xpT1;
+      document.getElementById('editStudentXpT2').value = st.xpT2;
+      document.getElementById('editStudentXpT3').value = st.xpT3;
+      document.getElementById('editStudentModal').classList.remove('hidden');
+    }
+
+    function closeEditStudentModal() {
+      document.getElementById('editStudentModal').classList.add('hidden');
+    }
+
+    async function saveEditedStudent(e) {
+      e.preventDefault();
+      const id = document.getElementById('editStudentId').value;
+      const realName = document.getElementById('editStudentRealName').value.trim();
+      const turma = document.getElementById('editStudentTurma').value;
+      const avatar = document.getElementById('editStudentAvatar').value.trim() || '📐';
+      const codinome = document.getElementById('editStudentCodinome').value.trim();
+      const xpT1 = Math.max(0, Number(document.getElementById('editStudentXpT1').value) || 0);
+      const xpT2 = Math.max(0, Number(document.getElementById('editStudentXpT2').value) || 0);
+      const xpT3 = Math.max(0, Number(document.getElementById('editStudentXpT3').value) || 0);
+
+      if (
+        state.students.some(
+          (s) => s.id !== id && s.codinome.toLowerCase() === codinome.toLowerCase()
+        )
+      ) {
+        showToast(`O codinome "${codinome}" já pertence a outro estudante.`, 'warning');
+        return;
+      }
+
+      state.students = state.students.map((st) =>
+        st.id === id ? { ...st, realName, turma, avatar, codinome, xpT1, xpT2, xpT3 } : st
+      );
+
+      closeEditStudentModal();
+      renderAll();
+      showToast('Dados do estudante atualizados!', 'success');
+      await pushToCloud(true);
+    }
+
+    function openConfirmDialog(type, payload = null) {
+      state.pendingConfirm = { type, payload };
+      const titleEl = document.getElementById('confirmDialogTitle');
+      const bodyEl = document.getElementById('confirmDialogBody');
+
+      if (type === 'resetTrimester') {
+        const sObj = TRIMESTERS[state.season];
+        titleEl.textContent = `Zerar XP do ${sObj.shortLabel}?`;
+        bodyEl.textContent = `Todos os estudantes voltarão a 0 XP no ${sObj.shortLabel} (início da nova temporada). Os demais trimestres e codinomes serão preservados.`;
+      } else if (type === 'deleteStudent') {
+        const st = state.students.find((s) => s.id === payload);
+        titleEl.textContent = 'Remover Estudante?';
+        bodyEl.textContent = st
+          ? `Deseja remover ${st.codinome} (${st.realName}) do sistema?`
+          : 'Remover este estudante?';
+      }
+
+      document.getElementById('confirmDialogModal').classList.remove('hidden');
+    }
+
+    function closeConfirmDialog() {
+      document.getElementById('confirmDialogModal').classList.add('hidden');
+      state.pendingConfirm = null;
+    }
+
+    async function executeConfirmedAction() {
+      const action = state.pendingConfirm;
+      closeConfirmDialog();
+      if (!action) return;
+
+      if (action.type === 'resetTrimester') {
+        const field = TRIMESTERS[state.season].xpKey;
+        state.students = state.students.map((st) => ({ ...st, [field]: 0 }));
+        state.logs = state.logs.filter((lg) => lg.season !== state.season);
+        renderAll();
+        showToast(`XP do ${TRIMESTERS[state.season].shortLabel} reiniciado!`, 'info');
+        await pushToCloud(true);
+      } else if (action.type === 'deleteStudent') {
+        state.students = state.students.filter((st) => st.id !== action.payload);
+        renderAll();
+        showToast('Estudante removido.', 'info');
+        await pushToCloud(true);
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // PAINEL DE SINCRONIZAÇÃO EM NUVEM (GITHUB + GOOGLE APPS SCRIPT)
+    // ------------------------------------------------------------------
+    function renderCloudConfigPanel() {
+      document.getElementById('cloudUrlInput').value = state.cloudUrl;
+      document.getElementById('appsScriptCodeBlock').textContent = GOOGLE_APPS_SCRIPT_TEMPLATE;
+    }
+
+    async function saveAndTestCloudUrl() {
+      const url = document.getElementById('cloudUrlInput').value.trim();
+      if (!url) {
+        showToast('Cole a URL do Google Apps Script antes de testar.', 'warning');
+        return;
+      }
+      state.cloudUrl = url;
+      localStorage.setItem(CLOUD_URL_KEY, url);
+      updateCloudStatusIndicators();
+
+      const ok = await fetchFromCloud(true);
+      if (ok) {
+        // Se a nuvem ainda estiver vazia (primeira conexão), envia os dados atuais automaticamente
+        if (state.students.length > 0) {
+          await pushToCloud(true);
+        }
+        showToast('☁️ Conectado e sincronizado com a nuvem!', 'success');
+      } else {
+        showToast('Não foi possível validar a URL. Confira se implantou como "Qualquer pessoa".', 'warning');
+      }
+    }
+
+    async function forcePushToCloud() {
+      const inputUrl = document.getElementById('cloudUrlInput').value.trim();
+      if (inputUrl) {
+        state.cloudUrl = inputUrl;
+        localStorage.setItem(CLOUD_URL_KEY, inputUrl);
+      }
+      if (!state.cloudUrl) {
+        showToast('Informe a URL do Google Apps Script primeiro.', 'warning');
+        return;
+      }
+      await pushToCloud(false);
+    }
+
+    function disconnectCloudUrl() {
+      state.cloudUrl = '';
+      state.cloudSynced = false;
+      localStorage.removeItem(CLOUD_URL_KEY);
+      document.getElementById('cloudUrlInput').value = '';
+      updateCloudStatusIndicators();
+      showToast('Nuvem desconectada. Operando em Modo Local.', 'info');
+    }
+
+    function copyGoogleAppsScript() {
+      const temp = document.createElement('textarea');
+      temp.value = GOOGLE_APPS_SCRIPT_TEMPLATE;
+      temp.style.position = 'fixed';
+      temp.style.left = '-9999px';
+      document.body.appendChild(temp);
+      temp.select();
+      try {
+        document.execCommand('copy');
+        showToast('📋 Script do Google copiado! Cole em Extensões ➔ Apps Script.', 'success');
+      } catch (e) {
+        showToast('Selecione o código na caixa e pressione Ctrl+C.', 'warning');
+      }
+      document.body.removeChild(temp);
+    }
+
+    // Gera e baixa o index.html completo já com DEFAULT_CLOUD_SYNC_URL preenchida para subir no GitHub
+    function downloadConfiguredIndexHtml() {
+      const urlToEmbed = (document.getElementById('cloudUrlInput').value.trim() || state.cloudUrl || '').replace(/"/g, '\\"');
+      if (!urlToEmbed) {
+        showToast('Cole e salve a URL do Google Apps Script antes de baixar o index.html.', 'warning');
+        return;
+      }
+
+      // Clona o DOM para garantir que o arquivo baixado abra sempre no Painel Público limpo
+      const clonedDoc = document.documentElement.cloneNode(true);
+      const pubView = clonedDoc.querySelector('#publicView');
+      const teachView = clonedDoc.querySelector('#teacherView');
+      if (pubView) pubView.classList.remove('hidden');
+      if (teachView) teachView.classList.add('hidden');
+
+      ['#pinModal', '#editStudentModal', '#confirmDialogModal'].forEach((sel) => {
+        const m = clonedDoc.querySelector(sel);
+        if (m) m.classList.add('hidden');
+      });
+      const toastContainer = clonedDoc.querySelector('#toastStack');
+      if (toastContainer) toastContainer.innerHTML = '';
+
+      let htmlContent = '<!DOCTYPE html>\n' + clonedDoc.outerHTML;
+      htmlContent = htmlContent.replace(
+        /const DEFAULT_CLOUD_SYNC_URL = "[^"]*";/,
+        `const DEFAULT_CLOUD_SYNC_URL = "${urlToEmbed}";`
+      );
+
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      showToast('⬇️ index.html baixado! Envie-o para o seu repositório no GitHub.', 'success');
+    }
+
+    // ------------------------------------------------------------------
+    // UTILITÁRIOS DE UI
+    // ------------------------------------------------------------------
+    function showToast(message, type = 'info') {
+      const stack = document.getElementById('toastStack');
+      const toast = document.createElement('div');
+      let theme = 'bg-slate-800 text-white border-slate-700';
+      if (type === 'success') theme = 'bg-emerald-950/95 text-emerald-300 border-emerald-400/50';
+      if (type === 'warning') theme = 'bg-amber-950/95 text-amber-300 border-amber-400/50';
+
+      toast.className = `pointer-events-auto p-3.5 rounded-xl border shadow-2xl text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 animate-panel ${theme}`;
+      toast.innerHTML = `
+        <span>${escapeHtml(message)}</span>
+        <button type="button" onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 text-xs font-bold">✕</button>
+      `;
+      stack.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, 4200);
+    }
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderAll() {
+      renderHeader();
+      document.getElementById('publicView').classList.toggle('hidden', state.isTeacher);
+      document.getElementById('teacherView').classList.toggle('hidden', !state.isTeacher);
+
+      if (state.isTeacher) {
+        renderTeacherView();
+      } else {
+        renderPublicView();
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // INICIALIZAÇÃO & AUTO-ATUALIZAÇÃO SILENCIOSA A CADA 45 SEGUNDOS
+    // ------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCachedData();
+      renderAll();
+
+      if (state.cloudUrl) {
+        fetchFromCloud(true);
+      }
+
+      setInterval(() => {
+        if (!state.isTeacher && state.cloudUrl) {
+          fetchFromCloud(true);
+        }
+      }, 45000);
+    });
+  </script>
+</body>
+</html>
